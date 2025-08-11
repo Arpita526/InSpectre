@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Scan Results</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        h1 { color: #333; }
+        table { border-collapse: collapse; width: 80%; margin-bottom: 20px; }
+        th, td { border: 1px solid #ccc; padding: 8px; }
+        th { background-color: #f2f2f2; }
+        .success { color: green; font-weight: bold; }
+        .fail { color: red; font-weight: bold; }
+        .warning { color: orange; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Scan Results for {{ url }}</h1>
+
+    <h2>Missing Security Headers</h2>
+    {% if results.headers.missing %}
+    <table>
+        <tr><th>Missing Header</th></tr>
+        {% for header in results.headers.missing %}
+        <tr><td>{{ header }}</td></tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p class="success">No missing security headers!</p>
+    {% endif %}
+
+    <h2>SSL Check</h2>
+    {% if results.ssl.valid %}
+        <p class="success">SSL is valid ✅</p>
+    {% else %}
+        <p class="fail">SSL check failed ❌ - {{ results.ssl.error }}</p>
+    {% endif %}
+
+    <h2>Clickjacking Protection</h2>
+    {% if results.clickjacking.protected %}
+        <p class="success">Protected against Clickjacking ✅</p>
+    {% else %}
+        <p class="fail">Not protected ❌ - {{ results.clickjacking.message }}</p>
+    {% endif %}
+
+    <h2>Directory Listing</h2>
+    {% if results.directory_listing.listing_enabled %}
+        <p class="fail">Directory listing is enabled ❌</p>
+    {% else %}
+        <p class="success">Directory listing is disabled ✅</p>
+    {% endif %}
+
+    <h2>Nmap Scan</h2>
+    {% if results.nmap %}
+        <table>
+            <tr><th>Port</th><th>State</th></tr>
+            {% for port, state in results.nmap.items() %}
+            <tr><td>{{ port }}</td><td>{{ state }}</td></tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p class="warning">Nmap scan not performed or no open ports found.</p>
+    {% endif %}
+</body>
+</html>
